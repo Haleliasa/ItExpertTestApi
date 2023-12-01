@@ -2,9 +2,9 @@
 
 namespace ItExpertTestApi.DAL.Sql
 {
-    public class SimpleSqlStatement : ISqlStatement
+    public class RawSqlStatement : ISqlStatement
     {
-        public SimpleSqlStatement(string statement)
+        public RawSqlStatement(string statement)
         {
             Statement = statement;
         }

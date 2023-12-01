@@ -6,20 +6,19 @@ namespace ItExpertTestApi.DAL.Sql
     {
         public CompositeSqlStatement(
             string separator,
-            params ISqlStatement[] statements)
-            : this(separator, (IEnumerable<ISqlStatement>)statements) { }
-
-        public CompositeSqlStatement(
-            string separator,
-            IEnumerable<ISqlStatement> statements)
+            IEnumerable<ISqlStatement> statements,
+            bool addParentheses = false)
         {
             Separator = separator;
             Statements = statements.ToList();
+            AddParentheses = addParentheses;
         }
 
         public string Separator { get; set; }
 
         public List<ISqlStatement> Statements { get; set; }
+
+        public bool AddParentheses { get; set; }
 
         public (string?, DynamicParameters?) Build()
         {
@@ -30,7 +29,11 @@ namespace ItExpertTestApi.DAL.Sql
                 (string? st, DynamicParameters? pars) = statement.Build();
                 if (st != null)
                 {
-                    statements.Add($"({st})");
+                    if (AddParentheses)
+                    {
+                        st = $"({st})";
+                    }
+                    statements.Add(st);
                     if (pars != null)
                     {
                         parameters ??= new DynamicParameters();

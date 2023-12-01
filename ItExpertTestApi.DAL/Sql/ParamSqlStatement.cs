@@ -10,11 +10,11 @@ namespace ItExpertTestApi.DAL.Sql
             string name,
             T? value,
             Func<string, string> statement,
-            bool notNull = true)
+            string? nullStatement = null)
         {
             Name = name;
             Value = value;
-            NotNull = notNull;
+            NullStatement = nullStatement;
             _statement = statement;
         }
 
@@ -22,7 +22,7 @@ namespace ItExpertTestApi.DAL.Sql
 
         public T? Value { get; set; }
 
-        public bool NotNull { get; set; }
+        public string? NullStatement { get; set; }
 
         public void SetStatement(Func<string, string> statement)
         {
@@ -31,9 +31,9 @@ namespace ItExpertTestApi.DAL.Sql
 
         public (string?, DynamicParameters?) Build()
         {
-            if (NotNull && Value == null)
+            if (Value == null)
             {
-                return (null, null);
+                return (NullStatement, null);
             }
             DynamicParameters parameters = new();
             string name = Name.StartsWith('@') ? Name : $"@{Name}";

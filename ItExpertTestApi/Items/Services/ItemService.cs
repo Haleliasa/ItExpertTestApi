@@ -17,24 +17,23 @@ namespace ItExpertTestApi.Items
 
         public async Task<GetItemsResult> GetItems(GetItemsOptions? options = null)
         {
-            DynamicParameters parameters = new();
             string? filter = null;
-            string? pagination = null;
+            DynamicParameters? parameters = null;
             if (options != null)
             {
-                (filter, DynamicParameters? filterPars) = SqlStatement.Where(
-                    SqlStatement.Param("code", options.Code, p => $"code = {p}"),
-                    SqlStatement.Param("codeFrom", options.CodeFrom, p => $"code >= {p}"),
-                    SqlStatement.Param("codeTo", options.CodeTo, p => $"code <= {p}"),
-                    SqlStatement.Param("value", options.Value, p => $"value = {p}"),
-                    SqlStatement.Param("valueSub", options.ValueContains?.ToLower(),
-                        p => $"position({p} in lower(value)) != 0"));
-                parameters.AddDynamicParams(filterPars);
-
-                (pagination, DynamicParameters? pagePars) = SqlStatement.Pagination(
-                    options.Page,
-                    options.PageSize);
-                parameters.AddDynamicParams(pagePars);
+                (filter, parameters) = Sql.Composite("\n", new ISqlStatement[]
+                {
+                    Sql.Where(
+                        Sql.Param("code", options.Code, p => $"code = {p}"),
+                        Sql.Param("codeFrom", options.CodeFrom, p => $"code >= {p}"),
+                        Sql.Param("codeTo", options.CodeTo, p => $"code <= {p}"),
+                        Sql.Param("value", options.Value, p => $"value = {p}"),
+                        Sql.Param("valueSub", options.ValueContains?.ToLower(),
+                            p => $"position({p} in lower(value)) != 0")),
+                    Sql.Pagination(
+                        options.Page,
+                        options.PageSize)
+                }).Build();
             }
 
             string sql = $"""
@@ -45,7 +44,6 @@ namespace ItExpertTestApi.Items
                     COUNT(1) OVER() as totalCount
                 FROM items
                 {filter}
-                {pagination}
                 """;
             
             using IDbConnection connection = await _connectionProvider.ConnectAsync();
