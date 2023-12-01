@@ -10,11 +10,15 @@ namespace ItExpertTestApi
             List<ValidationResult> results = new();
             if (Page < 1)
             {
-                results.Add(new ValidationResult($"{nameof(Page)} < 1"));
+                results.Add(new ValidationResult(
+                    "Must be >= 1",
+                    new[] { nameof(Page) }));
             }
             if (PageSize < 1)
             {
-                results.Add(new ValidationResult($"{nameof(PageSize)} < 1"));
+                results.Add(new ValidationResult(
+                    "Must be >= 1",
+                    new[] { nameof(PageSize) }));
             }
             return results;
         }
