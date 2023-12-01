@@ -16,17 +16,16 @@ namespace ItExpertTestApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ItemOut>>> GetItems(
+        public async Task<ActionResult<GetItemsResponse>> GetItems(
             [FromQuery] GetItemsParams itemsParams)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            IEnumerable<Item> items = await _service.GetItems(
+            GetItemsResult result = await _service.GetItems(
                 options: itemsParams.ToOptions());
-            List<ItemOut> itemsOut = items.Select(item => item.ToOut()).ToList();
-            return itemsOut;
+            return result.ToResponse();
         }
 
         [HttpPost]

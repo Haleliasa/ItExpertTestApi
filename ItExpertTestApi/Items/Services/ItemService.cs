@@ -15,7 +15,7 @@ namespace ItExpertTestApi.Items
             _connectionProvider = connectionProvider;
         }
 
-        public async Task<IEnumerable<Item>> GetItems(GetItemsOptions? options = null)
+        public async Task<GetItemsResult> GetItems(GetItemsOptions? options = null)
         {
             DynamicParameters parameters = new();
             string? filter = null;
@@ -39,18 +39,21 @@ namespace ItExpertTestApi.Items
 
             string sql = $"""
                 SELECT
-                    order,
+                    "order",
                     code,
-                    value
+                    value,
+                    COUNT(1) OVER() as totalCount
                 FROM items
                 {filter}
                 {pagination}
                 """;
             
             using IDbConnection connection = await _connectionProvider.ConnectAsync();
-            IEnumerable<Item> items = await connection.QueryAsync<Item>(sql, parameters);
+            IEnumerable<ItemTotalCount> items =
+                await connection.QueryAsync<ItemTotalCount>(sql, parameters);
+            int totalCount = items.FirstOrDefault()?.TotalCount ?? 0;
 
-            return items;
+            return new GetItemsResult(items, totalCount);
         }
 
         public async Task SetItems(IEnumerable<Item> items)
@@ -62,10 +65,10 @@ namespace ItExpertTestApi.Items
             using IDbConnection connection = await _connectionProvider.ConnectAsync();
             using IDbTransaction transaction = connection.BeginTransaction();
             await connection.ExecuteAsync(
-                "DELETE FROM items",
+                """DELETE FROM items""",
                 transaction: transaction);
             await connection.ExecuteAsync(
-                $"INSERT INTO items (order, code, value) VALUES {insertValues}",
+                $"""INSERT INTO items ("order", code, value) VALUES {insertValues}""",
                 transaction: transaction);
             transaction.Commit();
 
@@ -73,6 +76,11 @@ namespace ItExpertTestApi.Items
             {
                 sortedItems[i].Order = i + 1;
             }
+        }
+
+        private class ItemTotalCount : Item
+        {
+            public int TotalCount { get; set; }
         }
     }
 }

@@ -21,11 +21,14 @@ WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseCors(options => options
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader());
+
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseAuthorization();
 
 app.MapControllers();
 

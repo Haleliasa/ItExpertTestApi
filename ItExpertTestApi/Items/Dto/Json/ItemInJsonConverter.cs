@@ -51,7 +51,7 @@ namespace ItExpertTestApi.Items
                     nameof(ItemIn.Code),
                     StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (reader.TryGetInt32(out int code))
+                    if (!reader.TryGetInt32(out int code))
                     {
                         throw new JsonException();
                     }

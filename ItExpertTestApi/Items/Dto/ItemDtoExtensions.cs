@@ -16,6 +16,13 @@ namespace ItExpertTestApi.Items
                 PageSize: itemsParams.PageSize);
         }
 
+        public static GetItemsResponse ToResponse(this GetItemsResult result)
+        {
+            return new GetItemsResponse(
+                result.Items.Select(item => item.ToOut()).ToList(),
+                result.TotalCount);
+        }
+
         public static ItemOut ToOut(this Item model)
         {
             return new ItemOut(

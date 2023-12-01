@@ -8,13 +8,13 @@ namespace ItExpertTestApi
             ValidationContext validationContext)
         {
             List<ValidationResult> results = new();
-            if (Page < 0)
+            if (Page < 1)
             {
-                results.Add(new ValidationResult($"{nameof(Page)} < 0"));
+                results.Add(new ValidationResult($"{nameof(Page)} < 1"));
             }
-            if (PageSize < 0)
+            if (PageSize < 1)
             {
-                results.Add(new ValidationResult($"{nameof(PageSize)} < 0"));
+                results.Add(new ValidationResult($"{nameof(PageSize)} < 1"));
             }
             return results;
         }

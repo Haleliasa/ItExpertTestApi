@@ -4,7 +4,7 @@ namespace ItExpertTestApi.Items
 {
     public interface IItemService
     {
-        Task<IEnumerable<Item>> GetItems(GetItemsOptions? options = null);
+        Task<GetItemsResult> GetItems(GetItemsOptions? options = null);
 
         Task SetItems(IEnumerable<Item> items);
     }
